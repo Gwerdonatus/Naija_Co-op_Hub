@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center">Chat with {{ receiver.username }}</h2>
+
+    <!-- Chat Box -->
+    <div class="chat-box border rounded p-3 mb-3" style="height: 400px; overflow-y: auto; background-color: #f8f9fa;">
+        {% for message in messages %}
+            <div class="d-flex {% if message.sender == request.user %}justify-content-end{% else %}justify-content-start{% endif %} mb-2">
+                <div class="p-2 rounded shadow-sm {% if message.sender == request.user %}bg-primary text-white{% else %}bg-light{% endif %}" style="max-width: 70%;">
+                    <strong>{{ message.sender.username }}</strong><br>
+                    
+                    {% if message.content %}
+                        <p class="mb-1">{{ message.content }}</p>
+                    {% endif %}
+
+                    {% if message.image %}
+                        <img src="{{ message.image.url }}" class="img-fluid rounded" style="max-width: 200px;">
+                    {% endif %}
+
+                    {% if message.voice_note %}
+                        <audio controls class="mt-1 w-100">
+                            <source src="{{ message.voice_note.url }}" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                    {% endif %}
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-muted text-center">No messages yet.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Message Form -->
+    <form method="post" enctype="multipart/form-data" class="message-form">
+        {% csrf_token %}
+        <div class="input-group">
+            <textarea name="content" class="form-control chat-input" placeholder="Type a message..." rows="1"></textarea>
+            
+            <!-- Image Upload -->
+            <label for="image-upload" class="btn btn-outline-secondary">
+                📷
+                <input type="file" name="image" id="image-upload" class="d-none">
+            </label>
+
+            <!-- Voice Recording -->
+            <button type="button" id="record-btn" class="btn btn-outline-secondary">🎤</button>
+            <span id="recording-indicator" class="text-danger d-none">Recording...</span>
+            <input type="file" name="voice_note" id="audio-input" class="d-none">
+
+            <!-- Send Button -->
+            <button type="submit" class="btn btn-primary send-btn">➤</button>
+        </div>
+    </form>
+</div>
+
+<!-- JavaScript for Voice Recording -->
+<script>
+    let recordBtn = document.getElementById("record-btn");
+    let audioInput = document.getElementById("audio-input");
+    let recordingIndicator = document.getElementById("recording-indicator");
+
+    let mediaRecorder;
+    let chunks = [];
+
+    recordBtn.addEventListener("click", async () => {
+        if (!mediaRecorder || mediaRecorder.state === "inactive") {
+            let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.start();
+
+            recordBtn.textContent = "🛑"; // Change to stop icon
+            recordingIndicator.classList.remove("d-none"); // Show recording indicator
+
+            mediaRecorder.ondataavailable = (event) => {
+                chunks.push(event.data);
+            };
+
+            mediaRecorder.onstop = async () => {
+                let blob = new Blob(chunks, { type: "audio/mpeg" });
+                let file = new File([blob], "voice_message.mp3", { type: "audio/mpeg" });
+
+                let dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                audioInput.files = dataTransfer.files;
+
+                recordBtn.textContent = "🎤"; // Reset button
+                recordingIndicator.classList.add("d-none"); // Hide recording indicator
+            };
+        } else {
+            mediaRecorder.stop();
+        }
+    });
+</script>
+
+{% endblock %}

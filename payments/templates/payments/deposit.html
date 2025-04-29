@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <form method="post">
+        {% csrf_token %}
+        <label for="amount">Enter Amount (₦):</label>
+        <input type="number" name="amount" required>
+        <button type="submit">Deposit</button>
+    </form>
+{% endblock  %}

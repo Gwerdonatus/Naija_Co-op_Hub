@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center text-success">Adashe (Esusu) Savings Dashboard</h2>
+
+    <!-- Joined Savings Pools Section -->
+    <div class="row">
+        <h4>📢 My Joined Savings Pools</h4>
+        {% if joined_pools %}
+            {% for pool in joined_pools %}
+            <div class="col-md-6">
+                <div class="card shadow-sm p-3 mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">{{ pool.name }}</h5>
+                        <p><strong>Start:</strong> {{ pool.start_date }} | <strong>End:</strong> {{ pool.end_date }}</p>
+                        <p><strong>Contribution:</strong> ₦{{ pool.contribution_amount }} ({{ pool.contribution_frequency }})</p>
+
+                        <!-- Progress Bar for Contributions -->
+                        <div class="progress mt-3">
+                            <div class="progress-bar bg-success" role="progressbar" 
+                                 style="width: {{ pool.contribution_progress }}%;" 
+                                 aria-valuenow="{{ pool.contribution_progress }}" 
+                                 aria-valuemin="0" aria-valuemax="100">
+                                {{ pool.contribution_progress }}%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted">You have not joined any savings pools yet.</p>
+        {% endif %}
+    </div>
+
+    <!-- Contributions Section -->
+    <div class="row">
+        <h4>📊 My Contributions</h4>
+        {% if user_contributions %}
+            <canvas id="contributionChart"></canvas> <!-- Chart.js Placeholder -->
+            <ul class="list-group mt-3">
+                {% for contribution in user_contributions %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>{{ contribution.savings_pool.name }}</span>
+                    <span class="text-success">₦{{ contribution.amount }}</span>
+                    <small>{{ contribution.date_contributed }}</small>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted">No contributions made yet.</p>
+        {% endif %}
+    </div>
+
+    <!-- Payouts Section -->
+    <div class="row">
+        <h4>💵 My Payouts</h4>
+        {% if user_payouts %}
+            <canvas id="payoutChart"></canvas> <!-- Chart.js Placeholder -->
+            <ul class="list-group mt-3">
+                {% for payout in user_payouts %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>{{ payout.savings_pool.name }}</span>
+                    <span class="{% if payout.is_completed %}text-success{% else %}text-warning{% endif %}">
+                        ₦{{ payout.amount }} {% if payout.is_completed %}✅{% else %}⏳{% endif %}
+                    </span>
+                    <small>{{ payout.date_paid }}</small>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted">No payouts received yet.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- Chart.js for Visual Analytics -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Contribution Chart
+    var ctx = document.getElementById('contributionChart').getContext('2d');
+    var contributionChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [{% for contribution in user_contributions %}"{{ contribution.savings_pool.name }}",{% endfor %}],
+            datasets: [{
+                label: 'Contributions (₦)',
+                data: [{% for contribution in user_contributions %}{{ contribution.amount }},{% endfor %}],
+                backgroundColor: 'rgba(39, 174, 96, 0.6)',
+                borderColor: 'rgba(39, 174, 96, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // Payout Chart
+    var ctx2 = document.getElementById('payoutChart').getContext('2d');
+    var payoutChart = new Chart(ctx2, {
+        type: 'pie',
+        data: {
+            labels: [{% for payout in user_payouts %}"{{ payout.savings_pool.name }}",{% endfor %}],
+            datasets: [{
+                data: [{% for payout in user_payouts %}{{ payout.amount }},{% endfor %}],
+                backgroundColor: ['#2ecc71', '#f39c12', '#e74c3c', '#3498db', '#9b59b6']
+            }]
+        },
+        options: { responsive: true }
+    });
+</script>
+
+{% endblock %}

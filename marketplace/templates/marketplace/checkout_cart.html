@@ -1,0 +1,38 @@
+{% extends 'market.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h2>Checkout</h2>
+  <p class="lead">Total: ${{ total }}</p>
+  <button class="btn btn-success btn-lg" id="checkout-btn">Proceed to Payment</button>
+</div>
+
+<!-- Payment Option Modal for Cart Checkout -->
+<div class="modal fade" id="cartPaymentModal" tabindex="-1" aria-labelledby="cartPaymentModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cartPaymentModalLabel">Choose Payment Method</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Please choose your payment method:</p>
+        <div class="d-grid gap-2">
+          <a href="{% url 'marketplace:buy_cart_from_balance' %}" class="btn btn-outline-primary">
+            Pay from App Balance
+          </a>
+          <a href="{% url 'marketplace:buy_cart_paystack' %}" class="btn btn-outline-success">
+            Pay with Paystack
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('checkout-btn').addEventListener('click', function() {
+    var cartPaymentModal = new bootstrap.Modal(document.getElementById('cartPaymentModal'));
+    cartPaymentModal.show();
+});
+</script>
+{% endblock %}

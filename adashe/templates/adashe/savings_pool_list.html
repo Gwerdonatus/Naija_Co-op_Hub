@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="text-center my-4">
+        <h1 class="text-success fw-bold">Join an Adashe Pool & Grow Your Savings!</h1>
+        <p class="lead">Save and grow together with trusted cooperative pools. Join an existing pool or start your own today.</p>
+        <a href="{% url 'create_savings_pool' %}" class="btn btn-primary btn-lg">Create a Pool</a>
+    </div>
+
+    {% if pools %}
+        <div class="row">
+            {% for pool in pools %}
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-lg border-0">
+                        <div class="card-body">
+                            <h5 class="card-title text-success fw-bold">{{ pool.name }}</h5>
+                            <p class="card-text">
+                                <strong>Created by:</strong> {{ pool.created_by.username }} <br>
+                                <strong>Created on:</strong> {{ pool.created_at|date:"F j, Y" }} <br>
+                                <strong>Contribution:</strong> ₦{{ pool.contribution_amount }} <br>
+                                <strong>Frequency:</strong> {{ pool.contribution_frequency|title }}
+                            </p>
+                            
+                            <!-- View Pool Details Button -->
+                            <a href="{% url 'pool_details' pool.id %}" class="btn btn-outline-primary w-100 mb-2">
+                                View Details
+                            </a>
+
+                            <!-- Join Pool Button -->
+                            {% if request.user not in pool.members.all %}
+                                <a href="{% url 'join_savings_pool' pool.id %}" class="btn btn-success w-100">Join Pool</a>
+                            {% else %}
+                                <span class="badge bg-success w-100 py-2">You are a member</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-warning text-center">
+            <h4>No Active Pools Found</h4>
+            <p>Be the first to create a savings pool and invite your friends to save together.</p>
+            <a href="{% url 'create_savings_pool' %}" class="btn btn-outline-success">Start a Pool</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

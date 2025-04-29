@@ -1,0 +1,210 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naija Co-op Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #ffffff, #e0f7fa);
+            transition: background 0.5s ease-in-out;
+        }
+
+        .hero {
+            background: url('{% static "images/backgroundkid.jpg" %}') no-repeat center center/cover;
+            background-size: cover;
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            transition: background 0.5s ease-in-out;
+        }
+
+        .hero h1, .hero p {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .btn-primary {
+            background-color: #28a745 !important;
+            border-color: #28a745 !important;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #004d00 !important;
+            transform: translateY(-3px);
+        }
+
+        .btn-outline-success {
+            color: #28a745;
+            border-color: #28a745;
+            transition: color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .btn-outline-success:hover {
+            color: white;
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        .card {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: green !important;
+        }
+
+        /* Icon hover effect */
+        .card i {
+            color: #28a745;
+            transition: color 0.3s ease;
+        }
+
+        .card i:hover {
+            color: #007bff;
+        }
+
+        /* Footer with a subtle green background */
+        .footer {
+            background: #28a745;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">Naija Co-op Hub</a>
+            <div>
+                <a href="{% url "login_form" %}" class="btn btn-outline-success me-2">Login</a>
+                <a href="{% url "signup_form" %}" class="btn btn-success">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="container">
+            <h1>Welcome to Naija Co-op Hub</h1>
+            <p>Empowering Nigerian businesses and communities through cooperation.</p>
+            <a href="#" class="btn btn-primary btn-lg">Explore Features</a>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="container my-5">
+        <h2 class="text-center mb-4">Core Features</h2>
+        <div class="row g-4">
+            <!-- Esusu (Savings & Credit) -->
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <i class="fa fa-piggy-bank fa-3x mb-3"></i>
+                        <h5 class="card-title">Esusu (Savings & Credit)</h5>
+                        <p class="card-text">Digitize the traditional savings and loan model with transparency and ease.</p>
+                        <a href="#" class="btn btn-primary">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Shared Marketplace -->
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <i class="fa fa-store fa-3x mb-3"></i>
+                        <h5 class="card-title">Shared Marketplace</h5>
+                        <p class="card-text">Showcase your goods and services to a wider audience effortlessly.</p>
+                        <a href="#" class="btn btn-primary">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Micro-Investments -->
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <i class="fa fa-hand-holding-usd fa-3x mb-3"></i>
+                        <h5 class="card-title">Micro-Investments</h5>
+                        <p class="card-text">Co-invest in businesses, real estate, or agriculture with transparent tracking.</p>
+                        <a href="#" class="btn btn-primary">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Training Hub -->
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <i class="fa fa-chalkboard-teacher fa-3x mb-3"></i>
+                        <h5 class="card-title">Training Hub</h5>
+                        <p class="card-text">Access courses and mentorship on financial management, marketing, and more.</p>
+                        <a href="#" class="btn btn-primary">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Collaboration and Networking -->
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <i class="fa fa-users fa-3x mb-3"></i>
+                        <h5 class="card-title">Collaboration & Networking</h5>
+                        <p class="card-text">Join communities to share resources, advice, and leads.</p>
+                        <a href="#" class="btn btn-primary">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            <!-- AI-Driven Business Insights -->
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <i class="fa fa-brain fa-3x mb-3"></i>
+                        <h5 class="card-title">AI-Driven Business Insights</h5>
+                        <p class="card-text">Receive tailored advice for pricing, marketing, and supply chain optimization.</p>
+                        <a href="#" class="btn btn-primary">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Access to Government and NGO Programs -->
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <i class="fa fa-building fa-3x mb-3"></i>
+                        <h5 class="card-title">Government & NGO Programs</h5>
+                        <p class="card-text">Connect with grants, initiatives, and subsidies easily.</p>
+                        <a href="#" class="btn btn-primary">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Integrated Logistics -->
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <i class="fa fa-truck fa-3x mb-3"></i>
+                        <h5 class="card-title">Integrated Logistics</h5>
+                        <p class="card-text">Get affordable shipping solutions and manage deliveries seamlessly.</p>
+                        <a href="#" class="btn btn-primary">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>© 2025 Naija Co-op Hub | All Rights Reserved</p>
+        <p>Contact Us: info@naijacoophub.com</p>
+    </div>
+</body>
+</html>

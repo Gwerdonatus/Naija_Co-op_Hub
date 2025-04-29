@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+    <h2 class="text-center mb-3">Chat with {{ receiver.username }}</h2>
+
+    <div class="chat-container border rounded shadow-sm p-3">
+        <div class="chat-box p-3">
+            {% for message in messages %}
+                <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+                    <p class="message-content">
+                        <strong>{{ message.sender.username }}:</strong> {{ message.content }}
+                    </p>
+                    {% if message.image %}
+                        <img src="{{ message.image.url }}" class="message-image" alt="Sent Image">
+                    {% endif %}
+                </div>
+            {% empty %}
+                <p class="text-muted text-center">No messages yet.</p>
+            {% endfor %}
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="message-form">
+            {% csrf_token %}
+            <div class="input-group">
+                <textarea name="content" class="form-control chat-input" placeholder="Type a message..." rows="1"></textarea>
+                <label for="image-upload" class="image-upload-label">
+                    📷
+                    <input type="file" name="image" id="image-upload" class="d-none">
+                </label>
+                <button type="submit" class="btn btn-primary send-btn">➤</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .chat-container {
+        max-width: 600px;
+        margin: auto;
+        background: #f8f9fa;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .chat-box {
+        height: 400px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        padding-bottom: 10px;
+        background: #ffffff;
+        border-radius: 10px;
+    }
+
+    .message {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10px;
+    }
+
+    .message.sent {
+        align-items: flex-end;
+    }
+
+    .message.received {
+        align-items: flex-start;
+    }
+
+    .message-content {
+        padding: 10px 15px;
+        border-radius: 15px;
+        max-width: 75%;
+        font-size: 14px;
+        line-height: 1.4;
+        display: inline-block;
+    }
+
+    .message.sent .message-content {
+        background: #007bff;
+        color: white;
+        border-bottom-right-radius: 2px;
+    }
+
+    .message.received .message-content {
+        background: #e9ecef;
+        color: black;
+        border-bottom-left-radius: 2px;
+    }
+
+    .message-image {
+        max-width: 200px;
+        border-radius: 10px;
+        margin-top: 5px;
+    }
+
+    .message-form {
+        display: flex;
+        padding: 8px;
+        background: #ffffff;
+        border-top: 1px solid #dee2e6;
+        position: sticky;
+        bottom: 0;
+        width: 100%;
+    }
+
+    .input-group {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        background: #f8f9fa;
+        border-radius: 30px;
+        padding: 5px;
+        border: 1px solid #ccc;
+    }
+
+    .chat-input {
+        flex: 1;
+        border: none;
+        padding: 8px;
+        border-radius: 20px;
+        outline: none;
+        background: transparent;
+    }
+
+    .image-upload-label {
+        cursor: pointer;
+        font-size: 20px;
+        margin-right: 10px;
+    }
+
+    .send-btn {
+        background: #007bff;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 50%;
+        font-size: 16px;
+        color: white;
+        cursor: pointer;
+    }
+
+    .send-btn:hover {
+        background: #0056b3;
+    }
+
+    @media (max-width: 576px) {
+        .chat-container {
+            width: 100%;
+            padding: 10px;
+        }
+
+        .chat-box {
+            height: 350px;
+        }
+
+        .message-content {
+            font-size: 13px;
+            max-width: 85%;
+        }
+
+        .message-image {
+            max-width: 150px;
+        }
+
+        .chat-input {
+            font-size: 14px;
+        }
+    }
+</style>
+
+{% endblock %}

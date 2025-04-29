@@ -1,0 +1,29 @@
+{% extends 'market.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg p-4 rounded-lg" style="max-width: 600px; margin: auto;">
+        <h2 class="text-center mb-4">Become a Seller 🚀</h2>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <div class="mb-3">
+                <label for="id_business_name" class="form-label">Business Name</label>
+                {{ form.business_name }}
+            </div>
+            <div class="mb-3">
+                <label for="id_bank_name" class="form-label">Bank Name</label>
+                {{ form.bank_name }}
+            </div>
+            <div class="mb-3">
+                <label for="id_account_number" class="form-label">Account Number</label>
+                {{ form.account_number }}
+            </div>
+            <div class="mb-3">
+                <label for="id_account_holder_name" class="form-label">Account Holder Name</label>
+                {{ form.account_holder_name }}
+            </div>
+            <button type="submit" class="btn btn-success btn-lg w-100">Register as Seller</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

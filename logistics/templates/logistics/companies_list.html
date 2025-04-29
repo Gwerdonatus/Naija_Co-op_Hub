@@ -1,0 +1,26 @@
+{% extends 'logistics/logistics_base.html' %}
+{% block title %}Available Logistic Partners{% endblock %}
+
+{% block content %}
+<div class="my-5">
+  <h1 class="mb-4 text-center">Available Logistic Partners</h1>
+  {% if companies %}
+    <div class="list-group">
+      {% for company in companies %}
+        <a href="#" class="list-group-item list-group-item-action">
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">{{ company.name }}</h5>
+            <small>Applied on: {{ company.applied_on|date:"M d, Y" }}</small>
+          </div>
+          <p class="mb-1">{{ company.services_offered }}</p>
+          <small>Contact: {{ company.email }} | {{ company.phone }}</small>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info text-center">
+      No logistic partners available at the moment.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

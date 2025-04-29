@@ -1,0 +1,40 @@
+{% extends 'base_community.html' %}
+{% block title %}Explore Communities{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+  <div class="col text-center">
+    <br>
+    <h2 class="text-primary">Explore Communities</h2>
+    <p class="text-muted">Join trending communities and connect with like-minded people.</p>
+  </div>
+</div>
+
+<div class="row">
+  {% for community in communities %}
+    <div class="col-md-4 mb-3">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{ community.name }}</h5>
+          <p class="card-text text-muted">{{ community.description|truncatewords:20 }}</p>
+          
+          <small class="text-muted d-block mb-2">Created on {{ community.created_at|date:"M d, Y" }}</small>
+          <small class="text-muted d-block mb-2">{{ community.members.count }} members</small>
+          
+          <a href="{% url 'community:community_detail' slug=community.slug %}" class="btn btn-primary">View Community</a>
+
+          {% if request.user in community.members.all %}
+            <span class="badge bg-success float-end">Joined</span>
+          {% else %}
+            <a href="{% url 'community:community_join' slug=community.slug %}" class="btn btn-outline-success btn-sm float-end">Join</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <div class="col">
+      <p class="text-muted text-center">No communities found. <a href="{% url 'community:community_create' %}">Create one now!</a></p>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

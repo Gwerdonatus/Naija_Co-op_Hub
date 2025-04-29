@@ -1,0 +1,199 @@
+{% extends 'base_community.html' %}
+{% block title %}{{ community.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <!-- Main Content -->
+    <div class="col-md-8">
+      <!-- Community Banner -->
+      <div class="banner-container mb-4">
+        <div class="banner-overlay">
+          <br>
+          <h1 class="text-success">{{ community.name }}</h1>
+          <p class="text-dark">{{ community.description }}</p>
+
+        </div>
+      </div>
+
+      <!-- Community Header -->
+      <div class="card mb-4 shadow-sm">
+        <div class="card-body d-flex justify-content-between align-items-center">
+          <div>
+            <p class="text-muted">
+              Created by 
+              <a href="{% url 'profile_view' username=community.created_by.username %}" class="d-flex align-items-center text-decoration-none">
+                <img
+                  src="{{ community.created_by.profile.profile_picture.url|default:'/media/profile_pictures/fallback.jpeg' }}"
+                  class="profile-icon"
+                  onerror="this.onerror=null; this.src='/media/profile_pictures/fallback.jpeg';"
+                >
+                <strong>@{{ community.created_by.username }}</strong>
+              </a> 
+              on {{ community.created_at|date:"M d, Y" }}
+            </p>
+          </div>
+          <div>
+            {% if request.user in community.members.all %}
+              <a href="{% url 'community:community_leave' slug=community.slug %}" class="btn btn-outline-danger btn-sm">Leave</a>
+            {% else %}
+              <a href="{% url 'community:community_join' slug=community.slug %}" class="btn btn-outline-success btn-sm">Join</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Post Creation Form -->
+      <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">Create a Post</h5>
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ post_form.as_p }}
+            <button type="submit" class="btn btn-primary btn-sm" name="post_submit">Post</button> 
+          </form>
+        </div>
+      </div>
+
+      <!-- List of Posts -->
+      {% for post in posts %}
+        <div class="card mb-4 shadow-sm post-card">
+          <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+              <a href="{% url 'profile_view' username=post.author.username %}" class="d-flex align-items-center text-decoration-none">
+                <img
+                  src="{{ post.author.profile.profile_picture.url|default:'/media/profile_pictures/fallback.jpeg' }}"
+                  class="profile-icon"
+                  onerror="this.onerror=null; this.src='/media/profile_pictures/fallback.jpeg';"
+                >
+                <strong>@{{ post.author.username }}</strong>
+              </a>
+              <small class="text-muted ms-3">{{ post.created_at|date:"M d, Y H:i" }}</small>
+            </div>
+
+            <p class="card-text">{{ post.content }}</p>
+            {% if post.image %}
+              <div class="text-center">
+                <img src="{{ post.image.url }}" class="img-fluid rounded">
+              </div>
+            {% endif %}
+
+            <!-- Post Actions (Upvote & Downvote) -->
+            <div class="d-flex align-items-center mt-3 post-actions">
+              <button class="btn btn-sm upvote-btn {% if request.user in post.upvotes.all %}active{% endif %}" 
+                      onclick="votePost({{ post.id }}, 'upvote', this)">
+                <i class="fas fa-arrow-up"></i> 
+                Upvote <span id="upvote-count-{{ post.id }}">{{ post.upvotes.count }}</span>
+              </button>
+
+              <button class="btn btn-sm downvote-btn {% if request.user in post.downvotes.all %}active{% endif %}" 
+                      onclick="votePost({{ post.id }}, 'downvote', this)">
+                <i class="fas fa-arrow-down"></i> 
+                Downvote <span id="downvote-count-{{ post.id }}">{{ post.downvotes.count }}</span>
+              </button>
+
+              <a href="{% url 'community:comment_create' post_id=post.id %}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-comment"></i> Comment
+              </a>
+              {% if post.author == request.user %}
+                <a href="{% url 'community:post_delete' post_id=post.id %}" class="btn btn-sm btn-outline-danger">
+                  <i class="fas fa-trash"></i> Delete
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-muted">No posts yet. Be the first to post!</p>
+      {% endfor %}
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-md-4">
+      <div class="card shadow-sm sidebar-card">
+        <div class="card-body">
+          <h5 class="card-title">About {{ community.name }}</h5>
+          <p class="card-text">{{ community.description }}</p>
+          <hr>
+          <p class="card-text">
+            <strong>Members:</strong> {{ community.members.count }}<br>
+            <strong>Posts:</strong> {{ posts.count }}
+          </p>
+          <a href="#" class="btn btn-primary btn-sm">Invite Friends</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Upvote & Downvote JavaScript -->
+<script>
+function votePost(postId, action, button) {
+    fetch(`/community/${action}/${postId}/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/json"
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById(`upvote-count-${postId}`).textContent = data.upvotes;
+        document.getElementById(`downvote-count-${postId}`).textContent = data.downvotes;
+
+        // Update button states
+        let upvoteBtn = document.querySelector(`.upvote-btn[onclick="votePost(${postId}, 'upvote', this)"]`);
+        let downvoteBtn = document.querySelector(`.downvote-btn[onclick="votePost(${postId}, 'downvote', this)"]`);
+
+        if (data.upvoted) {
+            upvoteBtn.classList.add("active");
+        } else {
+            upvoteBtn.classList.remove("active");
+        }
+
+        if (data.downvoted) {
+            downvoteBtn.classList.add("active");
+        } else {
+            downvoteBtn.classList.remove("active");
+        }
+    })
+    .catch(error => console.error("Error:", error));
+}
+</script>
+
+<!-- Custom CSS -->
+<style>
+  .navbar {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    background-color: #198754 !important;
+  }
+  .upvote-btn, .downvote-btn {
+    background-color: transparent;
+    border: none;
+    color: #555;
+    font-size: 16px;
+    margin-right: 10px;
+    cursor: pointer;
+  }
+  .upvote-btn.active { color: green; font-weight: bold; }
+  .downvote-btn.active { color: red; font-weight: bold; }
+  .post-card:hover {
+    transform: scale(1.02);
+  }
+  .sidebar-card {
+    position: sticky;
+    top: 100px;
+  }
+  .profile-icon {
+    width: 40px; /* Adjust as needed */
+    height: 40px; /* Ensure a consistent aspect ratio */
+    border-radius: 50%; /* Make it circular */
+    object-fit: cover; /* Ensure it covers the area without distortion */
+    margin-right: 8px; /* Add spacing between the image and the text */
+  }  
+</style>
+
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center text-primary">{{ pool.name }} - Pool Details</h2>
+    
+    <div class="card shadow p-4 mb-4">
+        <h5 class="card-title text-success">📅 Pool Information</h5>
+        <p><strong>Created By:</strong> {{ pool.created_by.username }}</p>
+        <p><strong>Start Date:</strong> {{ pool.start_date }}</p>
+        <p><strong>End Date:</strong> {{ pool.end_date }}</p>
+        <p><strong>Contribution Amount:</strong> ₦{{ pool.contribution_amount }}</p>
+        <p><strong>Contribution Frequency:</strong> {{ pool.contribution_frequency }}</p>
+        <p><strong>Total Members:</strong> {{ pool.members.count }}</p>
+    </div>
+
+    <!-- Contribution Progress -->
+    <h4>📊 Contribution Progress</h4>
+    <div class="progress mb-3">
+        <div class="progress-bar bg-success" role="progressbar" 
+             style="width: {{ contribution_progress }}%;" 
+             aria-valuenow="{{ contribution_progress }}" 
+             aria-valuemin="0" aria-valuemax="100">
+            {{ contribution_progress }}%
+        </div>
+    </div>
+
+    <!-- Next in Line for Payout Notification -->
+    {% if request.user in pool.payout_order.all %}
+        {% with next_user=pool.payout_order.all|first %}
+            {% if next_user == request.user %}
+                <div class="alert alert-info mt-3">
+                    You are next in line for a payout!
+                </div>
+            {% endif %}
+        {% endwith %}
+    {% endif %}
+
+    <!-- Member List -->
+    <h4>👥 Pool Members</h4>
+    <ul class="list-group mb-4">
+        {% for member in pool.members.all %}
+        <li class="list-group-item">
+            <a href="{% url 'profile_view' username=member.username %}">
+                {{ member.username }}
+            </a>
+        </li>
+        {% empty %}
+        <li class="list-group-item text-muted">No members yet.</li>
+        {% endfor %}
+    </ul>
+
+    <!-- My Contributions -->
+    <h4>💰 My Contributions</h4>
+    {% if user_contributions %}
+        <ul class="list-group">
+            {% for contribution in user_contributions %}
+            <li class="list-group-item d-flex justify-content-between">
+                <span>₦{{ contribution.amount }}</span>
+                <small>{{ contribution.date_contributed }}</small>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-muted">No contributions made yet.</p>
+    {% endif %}
+
+    <!-- My Payouts -->
+    <h4>💵 My Payouts</h4>
+    {% if user_payouts %}
+        <ul class="list-group">
+            {% for payout in user_payouts %}
+            <li class="list-group-item d-flex justify-content-between">
+                <span>₦{{ payout.amount }} {% if payout.is_completed %}✅{% else %}⏳{% endif %}</span>
+                <small>{{ payout.date_paid }}</small>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-muted">No payouts received yet.</p>
+    {% endif %}
+
+    <!-- Contribute to Pool Button -->
+    {% if request.user in pool.members.all %}
+        <div class="text-center mt-4">
+            <a href="{% url 'contribute_to_pool' pool.id %}" class="btn btn-warning btn-lg">
+                Contribute to Pool
+            </a>
+        </div>
+    {% else %}
+        <p class="text-muted text-center">Join the pool to start contributing.</p>
+    {% endif %}
+
+    <a href="{% url 'dashboard' %}" class="btn btn-primary mt-3">Back to Dashboard</a>
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'logistics/logistics_base.html' %}
+{% block title %}Order Tracking{% endblock %}
+
+{% block extra_head %}
+  <!-- React & ReactDOM via CDN -->
+  <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+  <!-- Babel for JSX transformation -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="my-5">
+  <h1 class="mb-4 text-center">Order Tracking</h1>
+  <div id="order-tracking-app"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script type="text/babel">
+  function OrderTrackingApp() {
+    const [orderId, setOrderId] = React.useState('');
+    const [trackingInfo, setTrackingInfo] = React.useState(null);
+    const [error, setError] = React.useState('');
+
+    const handleTrackOrder = async () => {
+      if (!orderId) {
+        setError('Please enter an Order ID');
+        return;
+      }
+      try {
+        const response = await fetch(`/api/track/${orderId}/`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch tracking data');
+        }
+        const data = await response.json();
+        setTrackingInfo(data);
+        setError('');
+      } catch (err) {
+        setError(err.message);
+        setTrackingInfo(null);
+      }
+    };
+
+    return (
+      <div>
+        <div className="mb-3">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Enter Order ID"
+            value={orderId}
+            onChange={(e) => setOrderId(e.target.value)}
+          />
+        </div>
+        <div className="text-center mb-3">
+          <button className="btn btn-primary" onClick={handleTrackOrder}>Track Order</button>
+        </div>
+        {error && <div className="alert alert-danger">{error}</div>}
+        {trackingInfo && (
+          <div className="card shadow-sm">
+            <div className="card-body">
+              <h5 className="card-title">Order Status: {trackingInfo.status}</h5>
+              <p className="card-text">Estimated Delivery: {trackingInfo.estimatedDeliveryTime}</p>
+              {/* Additional tracking details can be inserted here */}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  ReactDOM.render(<OrderTrackingApp />, document.getElementById('order-tracking-app'));
+</script>
+{% endblock %}

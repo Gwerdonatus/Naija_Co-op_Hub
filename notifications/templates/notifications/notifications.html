@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block content %}
+<div class="container mt-5">
+  <h2>Notifications</h2>
+  <form method="POST" action="{% url 'mark_all_read' %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">Mark all as read</button>
+  </form>
+  <ul class="list-group mt-3">
+    {% for notification in notifications %}
+      <li class="list-group-item {% if not notification.is_read %}bg-light{% endif %}">
+        <a href="{{ notification.link }}">{{ notification.message }}</a>
+        <br>
+        <small class="text-muted">{{ notification.created_at|naturaltime }}</small>
+      </li>
+    {% empty %}
+      <li class="list-group-item">You have no notifications.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}
